@@ -4,9 +4,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: false,
+  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+  port: Number(process.env.EMAIL_PORT) || 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -57,5 +57,18 @@ export const sendPasswordResetEmail = async (email, token) => {
     </div>
   `;
   return sendEmail(email, 'Reset Your DreamNex Password', html);
+};
+
+export const sendOtpEmail = async (email, name, otp) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Hi ${name || 'there'},</h2>
+      <p>Your DreamNex verification code is:</p>
+      <div style="font-size: 32px; letter-spacing: 6px; font-weight: bold; margin: 20px 0;">${otp}</div>
+      <p>This code will expire in 10 minutes. If you did not request this, please ignore this email.</p>
+      <p>Thanks,<br/>DreamNex Team</p>
+    </div>
+  `;
+  return sendEmail(email, 'Your DreamNex Verification Code', html);
 };
 

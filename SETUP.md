@@ -28,26 +28,30 @@ npm install
 ### 2. Backend Setup
 
 1. Navigate to `backend/` directory
-2. Copy `.env.example` to `.env`:
+2. Copy `env.example` to `.env` (the dotfile is ignored in git, so we keep the template without the dot):
    ```bash
-   cp .env.example .env
+   cp env.example .env
    ```
-3. Fill in your environment variables in `backend/.env`:
+3. Fill in your environment variables in `backend/.env` (see README for full list). Key values:
    ```
    PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/dreamnex
-   JWT_SECRET=your_super_secret_jwt_key_change_this
+   MONGO_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/dreamnex
+   JWT_SECRET=change_this_secret
    JWT_EXPIRES_IN=7d
-   CLOUDINARY_CLOUD_NAME=your_cloud_name
-   CLOUDINARY_API_KEY=your_api_key
-   CLOUDINARY_API_SECRET=your_api_secret
-   OPENAI_API_KEY=your_openai_api_key
+   OPENAI_API_KEY=sk-...
+   CLOUDINARY_CLOUD_NAME=...
+   CLOUDINARY_API_KEY=...
+   CLOUDINARY_API_SECRET=...
+   EMAIL_USER=your_dreamnex_sender@gmail.com
+   EMAIL_PASS=your_google_app_password
    EMAIL_HOST=smtp.gmail.com
-   EMAIL_PORT=587
-   EMAIL_USER=your_email@gmail.com
-   EMAIL_PASS=your_app_password
+   EMAIL_PORT=465
+   GOOGLE_CLIENT_ID=...
+   GOOGLE_CLIENT_SECRET=...
+   GOOGLE_REDIRECT_URI=http://localhost:5000/api/auth/google/callback
    FRONTEND_URL=http://localhost:3000
    ```
+   👉 Follow [`SETUP_AUTH.md`](./SETUP_AUTH.md) for detailed Gmail App Password & Google OAuth instructions.
 
 ### 3. Frontend Setup
 
@@ -55,6 +59,7 @@ npm install
 2. Create `.env.local` file:
    ```
    NEXT_PUBLIC_API_URL=http://localhost:5000/api
+   NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
    ```
 
 ### 4. Start MongoDB
@@ -168,9 +173,14 @@ dreamnex/
 ## API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - Register new user
+- `POST /api/auth/signup` - Register + send OTP
+- `POST /api/auth/verify-otp` - Verify OTP & get JWT
+- `POST /api/auth/resend-otp` - Resend OTP (30s cooldown)
 - `POST /api/auth/login` - Login user
-- `POST /api/auth/verify-email` - Verify email
+- `POST /api/auth/google` - Login via Google ID token
+- `GET /api/auth/ping` - Health check
+- `POST /api/auth/register` - **Legacy** register with email verification link
+- `POST /api/auth/verify-email` - **Legacy** verify email token
 - `POST /api/auth/forgot-password` - Request password reset
 - `POST /api/auth/reset-password` - Reset password
 - `GET /api/auth/me` - Get current user

@@ -5,7 +5,9 @@ interface User {
   name: string;
   email: string;
   role: string;
-  isEmailVerified: boolean;
+  emailVerified?: boolean;
+  isEmailVerified?: boolean;
+  avatarUrl?: string;
 }
 
 interface AuthState {
