@@ -6,10 +6,23 @@ import { toast } from "@/components/ui/toaster";
 import api from "@/lib/api";
 import { useAuthStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
+import { ButtonProps } from "@/components/ui/button";
+import { Chrome } from "lucide-react";
 
 const GOOGLE_SCRIPT_ID = "google-identity-script";
 
-export default function GoogleSignInButton() {
+interface GoogleSignInButtonProps extends Omit<ButtonProps, 'onClick'> {
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  size?: "default" | "sm" | "lg" | "icon";
+  className?: string;
+}
+
+export default function GoogleSignInButton({ 
+  variant = "outline", 
+  size = "default",
+  className = "",
+  ...props 
+}: GoogleSignInButtonProps) {
   const buttonRef = useRef<HTMLDivElement | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [manualLoading, setManualLoading] = useState(false);
@@ -30,10 +43,14 @@ export default function GoogleSignInButton() {
         client_id: clientId,
         callback: handleCredentialResponse,
       });
+      const buttonTheme = variant === "outline" ? "outline" : "filled_blue";
+      const buttonSize = size === "lg" ? "large" : size === "sm" ? "small" : "medium";
+      
       window.google.accounts.id.renderButton(buttonRef.current, {
-        theme: "outline",
-        size: "large",
+        theme: buttonTheme,
+        size: buttonSize,
         width: "100%",
+        text: "signin_with",
       });
       window.google.accounts.id.prompt();
       setScriptLoaded(true);
@@ -96,16 +113,19 @@ export default function GoogleSignInButton() {
   }
 
   return (
-    <div className="w-full">
+    <div className={`w-full ${className}`}>
       <div ref={buttonRef} className="w-full flex justify-center" />
       {!scriptLoaded && (
         <Button
           type="button"
-          className="w-full mt-2"
-          variant="outline"
+          className={`w-full ${className}`}
+          variant={variant}
+          size={size}
           onClick={handleManualClick}
           disabled={manualLoading}
+          {...props}
         >
+          <Chrome className="mr-2 h-4 w-4" />
           {manualLoading ? "Signing in..." : "Continue with Google"}
         </Button>
       )}
