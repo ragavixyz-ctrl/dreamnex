@@ -105,7 +105,7 @@ export const generateBrandStyle = async (req, res) => {
     Format as JSON with keys: primaryColors, secondaryColors, accentColors, fonts, moodBoard.`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -152,7 +152,7 @@ export const generateBrandStory = async (req, res) => {
     Format as JSON with keys: tagline, story, mission, vision.`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -377,7 +377,7 @@ export const generateProductDescription = async (req, res) => {
     Format as JSON with keys: seoDescription, bulletPoints, highlights.`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -449,7 +449,7 @@ export const chat = async (req, res) => {
     Be friendly, helpful, and concise.`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
         ...(context || []),

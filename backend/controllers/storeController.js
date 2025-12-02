@@ -24,7 +24,7 @@ export const createStore = async (req, res) => {
     Format as JSON with keys: description, tagline, primaryColor, secondaryColor, accentColor, fonts.`;
 
     const storeCompletion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -146,7 +146,7 @@ const generateStoreProducts = async (storeId, storeName, niche) => {
         Format as JSON with keys: name, description, price, category, features.`;
 
         const productCompletion = await openai.chat.completions.create({
-          model: 'gpt-4',
+          model: 'gpt-4o-mini',
           messages: [
             {
               role: 'system',
