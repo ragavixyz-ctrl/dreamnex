@@ -4,17 +4,34 @@ DreamNex is a complete AI-powered e-commerce platform where AI builds brands, pr
 
 ## 🚀 Features
 
+### AI Features
 - **AI Brand Generation**: Logos, color palettes, typography, brand stories
 - **AI Product Design**: Generate product images and descriptions
 - **AI Store Creation**: Complete online stores with AI-generated content
 - **AI Marketing**: Generate ads, posters, and social media content
 - **AI Shopping Assistant**: Chatbot for product recommendations
-- **Advanced Authentication**:
-  - Email/password with OTP verification & resend flow
-  - Google Sign-In (OAuth 2.0, ID-token verification)
-  - JWT session handling with protected APIs
+- **AI Pricing Suggestions**: Optimal pricing based on competitor analysis, cost, and market trends
+- **AI SEO Tools**: Generate SEO titles, meta descriptions, keywords, and blog posts
+- **AI Product Photo Enhancer**: Improve image quality, remove backgrounds, add shadows/reflections
+
+### E-Commerce Features
+- **Shopping Cart**: Add, update, and manage cart items
+- **Checkout System**: Complete order flow with shipping address
+- **Order Management**: Track orders, view order history, order details
+- **Wishlist**: Save favorite products for later
+- **Payment Integration**: Stripe payment processing (ready for Razorpay)
+- **Customer Accounts**: Order history, wishlist, saved products
+
+### Store Features
+- **Store Themes**: Light, Dark, Minimal, Bold themes with customizable colors and layouts
+- **Store Dashboard**: Analytics, product management, sales tracking
+- **Multi-Vendor Ready**: Architecture supports vendor onboarding and payouts
+
+### Authentication
+- **Email/Password**: Registration with OTP verification & resend flow
+- **Google Sign-In**: OAuth 2.0 with ID-token verification
+- **JWT Session**: Secure token-based authentication
 - **Admin Panel**: Store approval and user management
-- **Store Dashboard**: Analytics and product management
 
 ## 🛠 Tech Stack
 
@@ -72,6 +89,8 @@ GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 GOOGLE_REDIRECT_URI=http://localhost:5000/api/auth/google/callback
 FRONTEND_URL=http://localhost:3000
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
 ```
 
 ### Frontend (`frontend/.env.local`)
@@ -132,7 +151,7 @@ curl -X POST http://localhost:5000/api/auth/google \
   -d '{"idToken":"<GOOGLE_ID_TOKEN>"}'
 ```
 
-### AI & Store APIs (unchanged)
+### AI & Store APIs
 - `POST /api/ai/brand-logo` – Generate brand logo
 - `POST /api/ai/product-design` – Generate product designs
 - `POST /api/ai/brand-style` – Generate brand color palette
@@ -147,7 +166,33 @@ curl -X POST http://localhost:5000/api/auth/google \
 - `POST /api/stores/create` – Create AI store
 - `GET /api/stores` – List stores
 - `GET /api/stores/:id` – Store details
+- `PUT /api/stores/:id/theme` – Update store theme (auth required)
 - `GET /api/stores/:id/analytics` – Store analytics (auth required)
+
+### E-Commerce APIs (New)
+- `GET /api/cart` – Get user's cart (auth required)
+- `POST /api/cart/add` – Add item to cart `{ productId, quantity }` (auth required)
+- `PUT /api/cart/item/:itemId` – Update cart item quantity (auth required)
+- `DELETE /api/cart/item/:itemId` – Remove item from cart (auth required)
+- `DELETE /api/cart/clear` – Clear cart (auth required)
+
+- `POST /api/orders` – Create order `{ shippingAddress, paymentMethod }` (auth required)
+- `GET /api/orders` – Get user's orders (auth required)
+- `GET /api/orders/:id` – Get order details (auth required)
+- `POST /api/orders/:id/confirm-payment` – Confirm payment (auth required)
+
+- `GET /api/wishlist` – Get user's wishlist (auth required)
+- `POST /api/wishlist/add` – Add to wishlist `{ productId }` (auth required)
+- `DELETE /api/wishlist/:productId` – Remove from wishlist (auth required)
+
+### AI Enhancement APIs (New)
+- `POST /api/pricing/suggest` – AI pricing suggestion `{ productName, category, cost?, description? }` (auth required)
+- `POST /api/seo/title` – Generate SEO titles (auth required)
+- `POST /api/seo/meta-description` – Generate meta descriptions (auth required)
+- `POST /api/seo/keywords` – Generate SEO keywords (auth required)
+- `POST /api/seo/blog-post` – Generate blog post (auth required)
+- `POST /api/product-enhancer/enhance` – Enhance product photo `{ imageUrl, enhancements[] }` (auth required)
+- `POST /api/product-enhancer/mockup` – Generate product mockup (auth required)
 
 👉 See `PROJECT_SUMMARY.md` for a complete architecture & file tree overview.
 

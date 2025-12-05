@@ -311,6 +311,36 @@ export const deleteStore = async (req, res) => {
   }
 };
 
+// Update store theme
+export const updateStoreTheme = async (req, res) => {
+  try {
+    const store = await Store.findById(req.params.id);
+
+    if (!store) {
+      return res.status(404).json({ message: 'Store not found' });
+    }
+
+    // Check ownership
+    if (store.owner.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    const { theme } = req.body;
+    
+    if (theme) {
+      store.theme = { ...store.theme, ...theme };
+      await store.save();
+    }
+
+    res.json({
+      success: true,
+      store,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update theme', error: error.message });
+  }
+};
+
 // Get store analytics
 export const getStoreAnalytics = async (req, res) => {
   try {

@@ -7,11 +7,15 @@ import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingBag, Eye } from 'lucide-react';
+import { ShoppingBag, Eye, Heart, ShoppingCart } from 'lucide-react';
+import { useAuthStore } from '@/lib/store';
+import api from '@/lib/api';
+import { toast } from '@/components/ui/toaster';
 
 export default function StoreDetailPage() {
   const params = useParams();
   const storeId = params.id as string;
+  const { user } = useAuthStore();
   const [store, setStore] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,12 +131,42 @@ export default function StoreDetailPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-2">
                     <span className="text-2xl font-bold">${product.price}</span>
-                    <Button>
-                      <ShoppingBag className="h-4 w-4 mr-2" />
-                      View
-                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    {user && (
+                      <>
+                        <Button
+                          className="flex-1"
+                          onClick={async () => {
+                            try {
+                              await api.post('/cart/add', { productId: product._id, quantity: 1 });
+                              toast({ title: 'Success', description: 'Added to cart' });
+                            } catch (error: any) {
+                              toast({ title: 'Error', description: error.response?.data?.message || 'Failed to add to cart', variant: 'destructive' });
+                            }
+                          }}
+                        >
+                          <ShoppingCart className="h-4 w-4 mr-2" />
+                          Add to Cart
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={async () => {
+                            try {
+                              await api.post('/wishlist/add', { productId: product._id });
+                              toast({ title: 'Success', description: 'Added to wishlist' });
+                            } catch (error: any) {
+                              toast({ title: 'Error', description: 'Failed to add to wishlist', variant: 'destructive' });
+                            }
+                          }}
+                        >
+                          <Heart className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                   {product.views !== undefined && (
                     <div className="flex items-center gap-1 text-sm text-muted-foreground mt-2">

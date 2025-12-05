@@ -24,10 +24,25 @@ const storeSchema = new mongoose.Schema({
     default: '',
   },
   theme: {
+    name: {
+      type: String,
+      enum: ['light', 'dark', 'minimal', 'bold', 'custom'],
+      default: 'light',
+    },
     primaryColor: String,
     secondaryColor: String,
     accentColor: String,
     fontFamily: String,
+    layout: {
+      type: String,
+      enum: ['grid', 'list', 'masonry'],
+      default: 'grid',
+    },
+    customColors: {
+      background: String,
+      text: String,
+      card: String,
+    },
   },
   status: {
     type: String,

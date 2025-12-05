@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { Store, User, LogOut, Menu, X } from 'lucide-react';
+import { Store, User, LogOut, Menu, X, ShoppingCart, Heart } from 'lucide-react';
 import { useState } from 'react';
 import Logo from '@/components/Logo';
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
@@ -43,6 +43,23 @@ export default function Navbar() {
                     <Button variant="ghost">Admin</Button>
                   </Link>
                 )}
+                <Link href="/cart">
+                  <Button variant="ghost" className="gap-2 relative">
+                    <ShoppingCart className="h-4 w-4" />
+                    Cart
+                  </Button>
+                </Link>
+                <Link href="/wishlist">
+                  <Button variant="ghost" className="gap-2">
+                    <Heart className="h-4 w-4" />
+                    Wishlist
+                  </Button>
+                </Link>
+                <Link href="/orders">
+                  <Button variant="ghost" className="gap-2">
+                    Orders
+                  </Button>
+                </Link>
                 <Link href="/dashboard">
                   <Button variant="ghost" className="gap-2">
                     <User className="h-4 w-4" />
@@ -94,6 +111,23 @@ export default function Navbar() {
                     <Button variant="ghost" className="w-full justify-start">Admin</Button>
                   </Link>
                 )}
+                <Link href="/cart" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start gap-2">
+                    <ShoppingCart className="h-4 w-4" />
+                    Cart
+                  </Button>
+                </Link>
+                <Link href="/wishlist" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start gap-2">
+                    <Heart className="h-4 w-4" />
+                    Wishlist
+                  </Button>
+                </Link>
+                <Link href="/orders" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start">
+                    Orders
+                  </Button>
+                </Link>
                 <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start gap-2">
                     <User className="h-4 w-4" />
