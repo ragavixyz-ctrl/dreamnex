@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import api from '@/lib/api';
+import apiClient from '@/lib/api';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ShoppingBag, Eye, Heart, ShoppingCart } from 'lucide-react';
 import { useAuthStore } from '@/lib/store';
-import api from '@/lib/api';
+
 import { toast } from '@/components/ui/toaster';
 
 export default function StoreDetailPage() {
@@ -21,7 +21,7 @@ export default function StoreDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get(`/stores/${storeId}`).then((res) => {
+    apiClient.get(`/stores/${storeId}`).then((res) => {
       setStore(res.data.store);
       setProducts(res.data.store.products || []);
       setLoading(false);
