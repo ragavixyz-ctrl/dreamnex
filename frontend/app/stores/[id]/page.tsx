@@ -141,7 +141,7 @@ export default function StoreDetailPage() {
                           className="flex-1"
                           onClick={async () => {
                             try {
-                              await api.post('/cart/add', { productId: product._id, quantity: 1 });
+                              await apiClient.post('/cart/add', { productId: product._id, quantity: 1 });
                               toast({ title: 'Success', description: 'Added to cart' });
                             } catch (error: any) {
                               toast({ title: 'Error', description: error.response?.data?.message || 'Failed to add to cart', variant: 'destructive' });
@@ -156,7 +156,7 @@ export default function StoreDetailPage() {
                           size="icon"
                           onClick={async () => {
                             try {
-                              await api.post('/wishlist/add', { productId: product._id });
+                              await apiClient.post('/wishlist/add', { productId: product._id });
                               toast({ title: 'Success', description: 'Added to wishlist' });
                             } catch (error: any) {
                               toast({ title: 'Error', description: 'Failed to add to wishlist', variant: 'destructive' });
