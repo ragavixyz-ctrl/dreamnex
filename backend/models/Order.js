@@ -85,8 +85,9 @@ orderSchema.pre('save', async function(next) {
   next();
 });
 
+// Indexes: orderNumber already has unique: true which creates an index automatically
+// Only define additional indexes that aren't already created by unique/required fields
 orderSchema.index({ user: 1 });
-orderSchema.index({ orderNumber: 1 });
 orderSchema.index({ orderStatus: 1 });
 
 const Order = mongoose.model('Order', orderSchema);
