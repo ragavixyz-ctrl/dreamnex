@@ -69,14 +69,29 @@ export default function RegisterPage() {
         name: formData.name,
         email: formData.email,
         password: formData.password,
+      }, {
+        timeout: 30000, // 30 second timeout
       });
       console.log("Signup response:", res.data);
-      setPendingUser({ userId: res.data.userId, email: formData.email });
-      setView("otp");
-      toast({
-        title: "OTP Sent",
-        description: "Enter the 6-digit code we emailed to you.",
-      });
+      
+      if (res.data.userId) {
+        setPendingUser({ userId: res.data.userId, email: formData.email });
+        setView("otp");
+        if (res.data.emailFailed) {
+          toast({
+            title: "Account Created",
+            description: "Account created but email failed. Please use 'Resend OTP' button.",
+            variant: "default",
+          });
+        } else {
+          toast({
+            title: "OTP Sent",
+            description: "Enter the 6-digit code we emailed to you.",
+          });
+        }
+      } else {
+        throw new Error("No userId received from server");
+      }
     } catch (error: any) {
       console.error("Signup error:", error);
       let errorMessage = "Registration failed";

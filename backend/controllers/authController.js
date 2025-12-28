@@ -36,24 +36,78 @@ export const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const existing = await User.findOne({ email });
+    
+    // If user exists but not verified, resend OTP instead of error
     if (existing) {
-      return res.status(409).json({ success: false, message: 'User already exists' });
+      if (!existing.emailVerified) {
+        try {
+          await handleSendOtp(existing);
+          return res.status(200).json({
+            success: true,
+            message: 'OTP resent to email',
+            userId: existing._id.toString(),
+          });
+        } catch (emailError) {
+          console.error('OTP resend error:', emailError);
+          return res.status(500).json({
+            success: false,
+            message: 'User exists but failed to send OTP. Please try again or contact support.',
+          });
+        }
+      } else {
+        return res.status(409).json({ success: false, message: 'User already exists and is verified. Please login instead.' });
+      }
     }
+
+    // Create new user
     const user = await User.create({
       name,
       email,
       password,
       emailVerified: false,
     });
-    await handleSendOtp(user);
-    return res.status(201).json({
-      success: true,
-      message: 'OTP sent to email',
-      userId: user._id.toString(),
-    });
+
+    // Try to send OTP, but don't fail signup if email fails
+    try {
+      await handleSendOtp(user);
+      return res.status(201).json({
+        success: true,
+        message: 'OTP sent to email',
+        userId: user._id.toString(),
+      });
+    } catch (emailError) {
+      console.error('OTP email error:', emailError);
+      // User is created, but email failed - still return success with userId
+      // User can use resend OTP later
+      return res.status(201).json({
+        success: true,
+        message: 'Account created but OTP email failed. Please use resend OTP.',
+        userId: user._id.toString(),
+        emailFailed: true,
+      });
+    }
   } catch (error) {
     console.error('Signup error', error);
-    return res.status(500).json({ success: false, message: 'Failed to sign up' });
+    // Check if it's a duplicate key error (user was created in a race condition)
+    if (error.code === 11000 || error.message?.includes('duplicate')) {
+      const existing = await User.findOne({ email: req.body.email });
+      if (existing && !existing.emailVerified) {
+        try {
+          await handleSendOtp(existing);
+          return res.status(200).json({
+            success: true,
+            message: 'OTP resent to email',
+            userId: existing._id.toString(),
+          });
+        } catch (emailError) {
+          return res.status(500).json({
+            success: false,
+            message: 'Account exists but failed to send OTP. Please try resend OTP.',
+          });
+        }
+      }
+    }
+    return res.status(500).json({ success: false, message: 'Failed to sign up: ' + (error.message || 'Unknown error') });
   }
 };
 
