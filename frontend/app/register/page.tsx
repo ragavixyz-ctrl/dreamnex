@@ -31,6 +31,17 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+
+    // Validate form fields
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       toast({
@@ -41,14 +52,25 @@ export default function RegisterPage() {
       return;
     }
 
+    if (formData.password.length < 6) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
+      console.log("Attempting signup...", { email: formData.email, name: formData.name });
       const res = await api.post("/auth/signup", {
         name: formData.name,
         email: formData.email,
         password: formData.password,
       });
+      console.log("Signup response:", res.data);
       setPendingUser({ userId: res.data.userId, email: formData.email });
       setView("otp");
       toast({
@@ -56,9 +78,28 @@ export default function RegisterPage() {
         description: "Enter the 6-digit code we emailed to you.",
       });
     } catch (error: any) {
+      console.error("Signup error:", error);
+      let errorMessage = "Registration failed";
+      
+      if (error.response?.data) {
+        // Handle validation errors
+        if (error.response.data.errors && Array.isArray(error.response.data.errors)) {
+          errorMessage = error.response.data.errors[0]?.message || error.response.data.message || errorMessage;
+        } else {
+          errorMessage = error.response.data.message || errorMessage;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Check for network errors
+      if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+        errorMessage = "Unable to connect to server. Please check your internet connection.";
+      }
+      
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Registration failed",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -99,7 +140,9 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Create Account</CardTitle>
-          <CardDescription>Sign up to start building with AI</CardDescription>
+          <CardDescription>
+            Create a new password for your DreamNex account (separate from your Google password)
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {view === "form" && (
@@ -128,7 +171,7 @@ export default function RegisterPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">Create Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -136,7 +179,11 @@ export default function RegisterPage() {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     minLength={6}
+                    placeholder="Create a new password (min. 6 characters)"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    This password is only for DreamNex, not your Google account
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirm Password</Label>

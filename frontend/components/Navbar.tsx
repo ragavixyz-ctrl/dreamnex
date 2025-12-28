@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import { Store, User, LogOut, Menu, X, ShoppingCart, Heart } from 'lucide-react';
+import { Store, User, LogOut, Menu, X, ShoppingCart, Heart, Settings, Info } from 'lucide-react';
 import { useState } from 'react';
 import Logo from '@/components/Logo';
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
@@ -30,6 +30,12 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-4">
+            <Link href="/about">
+              <Button variant="ghost" className="gap-2">
+                <Info className="h-4 w-4" />
+                About
+              </Button>
+            </Link>
             {user ? (
               <>
                 <Link href="/create-store">
@@ -66,6 +72,12 @@ export default function Navbar() {
                     Dashboard
                   </Button>
                 </Link>
+                <Link href="/settings">
+                  <Button variant="ghost" className="gap-2">
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Button>
+                </Link>
                 <Button variant="ghost" onClick={handleLogout} className="gap-2">
                   <LogOut className="h-4 w-4" />
                   Logout
@@ -98,6 +110,12 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t py-4 space-y-2">
+            <Link href="/about" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start gap-2">
+                <Info className="h-4 w-4" />
+                About
+              </Button>
+            </Link>
             {user ? (
               <>
                 <Link href="/create-store" onClick={() => setMobileMenuOpen(false)}>
@@ -132,6 +150,12 @@ export default function Navbar() {
                   <Button variant="ghost" className="w-full justify-start gap-2">
                     <User className="h-4 w-4" />
                     Dashboard
+                  </Button>
+                </Link>
+                <Link href="/settings" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start gap-2">
+                    <Settings className="h-4 w-4" />
+                    Settings
                   </Button>
                 </Link>
                 <Button variant="ghost" onClick={handleLogout} className="w-full justify-start gap-2">

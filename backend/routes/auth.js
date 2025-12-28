@@ -12,6 +12,8 @@ import {
   forgotPassword,
   resetPassword,
   getMe,
+  changePassword,
+  deleteAccount,
 } from '../controllers/authController.js';
 import { protect } from '../middlewares/auth.js';
 import { validateRequest } from '../middlewares/validate.js';
@@ -81,6 +83,19 @@ router.post('/verify-email', verifyEmail);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.get('/me', protect, getMe);
+
+// Account management routes
+router.post(
+  '/change-password',
+  protect,
+  [
+    body('currentPassword').notEmpty().withMessage('Current password is required'),
+    body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
+    validateRequest,
+  ],
+  changePassword
+);
+router.delete('/delete-account', protect, deleteAccount);
 
 export default router;
 

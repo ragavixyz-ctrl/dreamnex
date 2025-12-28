@@ -49,7 +49,7 @@ export const signup = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: 'OTP sent to email',
-      userId: user._id,
+      userId: user._id.toString(),
     });
   } catch (error) {
     console.error('Signup error', error);
@@ -332,5 +332,102 @@ export const getMe = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id).select('+password');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!user.password) {
+      return res.status(400).json({
+        success: false,
+        message: 'This account uses Google Sign-In. Please change your password through Google.',
+      });
+    }
+
+    if (!currentPassword) {
+      return res.status(400).json({ success: false, message: 'Current password is required' });
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be at least 6 characters',
+      });
+    }
+
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Current password is incorrect' });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    return res.json({ success: true, message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Change password error', error);
+    return res.status(500).json({ success: false, message: 'Failed to change password' });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Prevent admin account deletion
+    if (user.role === 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin accounts cannot be deleted',
+      });
+    }
+
+    // Import models dynamically to avoid circular dependencies
+    const Cart = (await import('../models/Cart.js')).default;
+    const Wishlist = (await import('../models/Wishlist.js')).default;
+    const Order = (await import('../models/Order.js')).default;
+    const Store = (await import('../models/Store.js')).default;
+    const Product = (await import('../models/Product.js')).default;
+
+    // Delete user's cart
+    await Cart.deleteOne({ user: userId });
+
+    // Delete user's wishlist
+    await Wishlist.deleteOne({ user: userId });
+
+    // Get all stores owned by user
+    const userStores = await Store.find({ owner: userId });
+
+    // Delete all products in user's stores
+    for (const store of userStores) {
+      await Product.deleteMany({ store: store._id });
+    }
+
+    // Delete user's stores
+    await Store.deleteMany({ owner: userId });
+
+    // Note: We keep orders for business records, but they will have orphaned user references
+    // You could anonymize them if needed:
+    // await Order.updateMany({ user: userId }, { $unset: { user: 1 } });
+
+    // Delete the user account
+    await User.findByIdAndDelete(userId);
+
+    return res.json({ success: true, message: 'Account deleted successfully' });
+  } catch (error) {
+    console.error('Delete account error', error);
+    return res.status(500).json({ success: false, message: 'Failed to delete account' });
   }
 };
